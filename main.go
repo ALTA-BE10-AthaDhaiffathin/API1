@@ -1,9 +1,9 @@
 package main
 
 import (
+	"strconv"
+	"log"
 	"net/http"
-  	"strconv"
-
   	"github.com/labstack/echo"
 )
 
@@ -29,14 +29,68 @@ func GetUsersController(c echo.Context) error {
 // get user by id
 func GetUserController(c echo.Context) error {
   	// your solution here
+	param := c.Param("id")
+	cnv, err := strconv.Atoi(param)
+	if err != nil {
+		log.Println("Cannot convert to int", err.Error())
+		return c.JSON(http.StatusInternalServerError, "cannot convert id")
+	}
+
+	if cnv == 0 || cnv > len(users) {
+		log.Println("Index out of range")
+		return c.JSON(http.StatusInternalServerError, "Index out of range")
+	} 
+  
+	res := map[string]interface{}{
+		"message": "Get user " + param,
+		"data":    users[cnv-1],
+	}
+	return c.JSON(http.StatusOK, res)
 }
+
+func removeUser(slice []User, index int) []User {
+	newSlice := []User{}
+	if index < 0 || index >= len(slice) {
+		log.Println("Index out of range")
+	} else if index == 0 {
+		newSlice = slice[1:]
+	} else if index == len(slice)-1 {
+		newSlice = slice[:len(slice)-1]
+	} else {
+		newSlice = append(newSlice, slice[:index]...)
+		newSlice = append(newSlice, slice[index+1:]...)
+	}
+	return newSlice
+}
+
 // delete user by id
 func DeleteUserController(c echo.Context) error {
   	// your solution here
+	param := c.Param("id")
+	cnv, err := strconv.Atoi(param)
+	if err != nil {
+		log.Println("Cannot convert to int", err.Error())
+		return c.JSON(http.StatusInternalServerError, "cannot convert id")
+	}
+  
+	if cnv == 0 || cnv > len(users) {
+		log.Println("Index out of range")
+		return c.JSON(http.StatusInternalServerError, "Index out of range")
+	} 
+	
+	res := map[string]interface{}{
+		"message": "Delete user " + param,
+		"data":    users[cnv-1],
+	}
+
+	users = removeUser(users, cnv-1)
+
+	return c.JSON(http.StatusOK, res)
 }
 // update user by id
 func UpdateUserController(c echo.Context) error {
   	// your solution here
+	return nil
 }
 
 // create new user
@@ -63,6 +117,9 @@ func main() {
 	// routing with query parameter
 	e.GET("/users", GetUsersController)
 	e.POST("/users", CreateUserController)
+	e.GET("/users/:id", GetUserController)
+	e.DELETE("/users/:id", DeleteUserController)
+	e.PUT("/users/:id", UpdateUserController)
 
 	// start the server, and log if it fails
 	e.Logger.Fatal(e.Start(":8000"))
