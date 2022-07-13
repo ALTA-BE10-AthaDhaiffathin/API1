@@ -113,10 +113,20 @@ func UpdateUserController(c echo.Context) error {
 			return c.JSON(http.StatusInternalServerError, "Wrong input")
 		}
 
+		// if user.Name == "" {
+		// 	user.Name = findUser.Name
+		// }
+		// if user.Email == "" {
+		// 	user.Name = findUser.Email
+		// }
+		// if user.Password == "" {
+		// 	user.Password = findUser.Password
+		// }
+
 		users[index] = user
 		res := map[string]interface{}{
 			"message": "Update user " + param,
-			"data":  user,
+			"data":  users[index],
 		}
 		return c.JSON(http.StatusOK, res)
 	}
