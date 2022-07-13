@@ -102,12 +102,21 @@ func UpdateUserController(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, "cannot convert id")
 	}
 
-	findUser, _ := FindUser(cnv)
+	findUser, index := FindUser(cnv)
 
 	if findUser.Name != "" {
+		user := User{}
+		user.Id = findUser.Id
+		err := c.Bind(&user)
+
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, "Wrong input")
+		}
+
+		users[index] = user
 		res := map[string]interface{}{
-			"message": "Get user " + param,
-			"data":  findUser,
+			"message": "Update user " + param,
+			"data":  user,
 		}
 		return c.JSON(http.StatusOK, res)
 	}
