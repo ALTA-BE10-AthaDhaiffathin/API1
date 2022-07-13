@@ -50,9 +50,18 @@ func GetUserController(c echo.Context) error {
 
 func removeUser(slice []User, index int) []User {
 	newSlice := []User{}
-	if index < 0 || index >= len(slice) {
-		log.Println("Index out of range")
-	} else if index == 0 {
+	i := 0
+	for i < len(users) {
+		if users[i].Id == index {
+			index = i
+			break
+		}
+		if i == len(users) - 1 && users[i].Id != index {
+			return nil
+		}
+		i++
+	}
+	if index == 0 {
 		newSlice = slice[1:]
 	} else if index == len(slice)-1 {
 		newSlice = slice[:len(slice)-1]
@@ -83,14 +92,17 @@ func DeleteUserController(c echo.Context) error {
 		"data":    users[cnv-1],
 	}
 
-	users = removeUser(users, cnv-1)
+	if removeUser(users, cnv-1) == nil {
+		return c.JSON(http.StatusInternalServerError, "Cant find user " + param)
+	}
 
+	users = removeUser(users, cnv-1)
 	return c.JSON(http.StatusOK, res)
 }
 // update user by id
 func UpdateUserController(c echo.Context) error {
   	// your solution here
-	return nil
+	
 }
 
 // create new user
