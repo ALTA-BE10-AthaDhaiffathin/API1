@@ -106,25 +106,13 @@ func UpdateUserController(c echo.Context) error {
 	findUser, index := FindUser(cnv)
 
 	if findUser.Name != "" {
-		user := User{}
-		user.Id = findUser.Id
-		err := c.Bind(&user)
+		err := c.Bind(&findUser)
 
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, "Wrong input")
 		}
 
-		if user.Name == "" {
-			user.Name = findUser.Name
-		}
-		if user.Email == "" {
-			user.Name = findUser.Email
-		}
-		if user.Password == "" {
-			user.Password = findUser.Password
-		}
-
-		users[index] = user
+		users[index] = findUser
 		res := map[string]interface{}{
 			"message": "Update user " + param,
 			"data":    users[index],
