@@ -26,6 +26,15 @@ func GetUsersController(c echo.Context) error {
 	})
 }
 
+func FindUser(id int) User {
+	for i := 0; i < len(users); i++ {
+		if users[i].Id == id {
+			return users[i]
+		}
+	}
+	return User{}
+}
+
 // get user by id
 func GetUserController(c echo.Context) error {
   	// your solution here
@@ -36,16 +45,16 @@ func GetUserController(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, "cannot convert id")
 	}
 
-	if cnv == 0 || cnv > len(users) {
-		log.Println("Index out of range")
-		return c.JSON(http.StatusInternalServerError, "Index out of range")
-	} 
-  
-	res := map[string]interface{}{
-		"message": "Get user " + param,
-		"data":    users[cnv-1],
+	findUser := FindUser(cnv)
+
+	if findUser.Name != "" {
+		res := map[string]interface{}{
+			"message": "Get user " + param,
+			"data":    findUser,
+		}
+		return c.JSON(http.StatusOK, res)
 	}
-	return c.JSON(http.StatusOK, res)
+	return c.JSON(http.StatusInternalServerError, "Cant find user " + param)
 }
 
 func removeUser(slice []User, index int) []User {
@@ -61,6 +70,7 @@ func removeUser(slice []User, index int) []User {
 		}
 		i++
 	}
+	index += 1
 	if index == 0 {
 		newSlice = slice[1:]
 	} else if index == len(slice)-1 {
@@ -82,7 +92,7 @@ func DeleteUserController(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, "cannot convert id")
 	}
   
-	if cnv == 0 || cnv > len(users) {
+	if cnv <= 0 || cnv > users[len(users)-1].Id {
 		log.Println("Index out of range")
 		return c.JSON(http.StatusInternalServerError, "Index out of range")
 	} 
@@ -99,10 +109,27 @@ func DeleteUserController(c echo.Context) error {
 	users = removeUser(users, cnv-1)
 	return c.JSON(http.StatusOK, res)
 }
+
 // update user by id
 func UpdateUserController(c echo.Context) error {
   	// your solution here
-	
+	param := c.Param("id")
+	cnv, err := strconv.Atoi(param)
+	if err != nil {
+		log.Println("Cannot convert to int", err.Error())
+		return c.JSON(http.StatusInternalServerError, "cannot convert id")
+	}
+
+	if cnv == 0 || cnv > len(users) {
+		log.Println("Index out of range")
+		return c.JSON(http.StatusInternalServerError, "Index out of range")
+	} 
+  
+	res := map[string]interface{}{
+		"message": "Get user " + param,
+		"data":    users[cnv-1],
+	}
+	return c.JSON(http.StatusOK, res)
 }
 
 // create new user
