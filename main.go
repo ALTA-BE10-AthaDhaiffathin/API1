@@ -1,16 +1,17 @@
 package main
 
 import (
-	"strconv"
 	"log"
 	"net/http"
-  	"github.com/labstack/echo"
+	"strconv"
+
+	"github.com/labstack/echo"
 )
 
 type User struct {
-  	Id    int    `json:"id" form:"id"`
-	Name  string `json:"name" form:"name"`
-	Email string `json:"email" form:"email"`
+	Id       int    `json:"id" form:"id"`
+	Name     string `json:"name" form:"name"`
+	Email    string `json:"email" form:"email"`
 	Password string `json:"password" form:"password"`
 }
 
@@ -37,7 +38,7 @@ func FindUser(id int) (User, int) {
 
 // get user by id
 func GetUserController(c echo.Context) error {
-  	// your solution here
+	// your solution here
 	param := c.Param("id")
 	cnv, err := strconv.Atoi(param)
 	if err != nil {
@@ -54,7 +55,7 @@ func GetUserController(c echo.Context) error {
 		}
 		return c.JSON(http.StatusOK, res)
 	}
-	return c.JSON(http.StatusInternalServerError, "Cant find user " + param)
+	return c.JSON(http.StatusInternalServerError, "Cant find user "+param)
 }
 
 func removeUser(slice []User, index int) []User {
@@ -89,12 +90,12 @@ func DeleteUserController(c echo.Context) error {
 		}
 		return c.JSON(http.StatusOK, res)
 	}
-	return c.JSON(http.StatusInternalServerError, "Cant find user " + param)
+	return c.JSON(http.StatusInternalServerError, "Cant find user "+param)
 }
 
 // update user by id
 func UpdateUserController(c echo.Context) error {
-  	// your solution here
+	// your solution here
 	param := c.Param("id")
 	cnv, err := strconv.Atoi(param)
 	if err != nil {
@@ -113,24 +114,24 @@ func UpdateUserController(c echo.Context) error {
 			return c.JSON(http.StatusInternalServerError, "Wrong input")
 		}
 
-		// if user.Name == "" {
-		// 	user.Name = findUser.Name
-		// }
-		// if user.Email == "" {
-		// 	user.Name = findUser.Email
-		// }
-		// if user.Password == "" {
-		// 	user.Password = findUser.Password
-		// }
+		if user.Name == "" {
+			user.Name = findUser.Name
+		}
+		if user.Email == "" {
+			user.Name = findUser.Email
+		}
+		if user.Password == "" {
+			user.Password = findUser.Password
+		}
 
 		users[index] = user
 		res := map[string]interface{}{
 			"message": "Update user " + param,
-			"data":  users[index],
+			"data":    users[index],
 		}
 		return c.JSON(http.StatusOK, res)
 	}
-	return c.JSON(http.StatusInternalServerError, "Cant find user " + param)
+	return c.JSON(http.StatusInternalServerError, "Cant find user "+param)
 }
 
 // create new user
@@ -151,6 +152,7 @@ func CreateUserController(c echo.Context) error {
 		"user":     user,
 	})
 }
+
 // ---------------------------------------------------
 func main() {
 	e := echo.New()
